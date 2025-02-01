@@ -239,6 +239,33 @@ def draw_score(score):
     screen.blit(score_text, (10, 10))  # Позиция текста (верхний левый угол)
 
 
+# Функция для отображения паузы
+def draw_pause():
+    font = pygame.font.Font(None, 74)
+    pause_text = font.render("PAUSED", True, YELLOW)
+    screen.blit(pause_text, (WIDTH // 2 - 100, HEIGHT // 2 - 50))
+
+
+# Главное меню
+def main_menu():
+    while True:
+        screen.fill(BLACK)
+        font = pygame.font.Font(None, 74)
+        title = font.render("Racing Game", True, WHITE)
+        start_button = font.render("Press SPACE to Start", True, GREEN)
+        screen.blit(title, (WIDTH // 2 - 140, HEIGHT // 2 - 100))
+        screen.blit(start_button, (WIDTH // 2 - 200, HEIGHT // 2))
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return  # Выход из меню и начало игры
+
+
 # Основная функция игры
 def game_loop():
     player = Player(WIDTH * 0.45, HEIGHT * 0.8)
@@ -246,7 +273,8 @@ def game_loop():
     enemy_manager = EnemyManager(5, 2, 5)  # 5 врагов с разной скоростью (от 2 до 5)
 
     game_over = False
-    score = 0  # Инициализация счета
+    score = 0
+    paused = False  # Флаг для паузы
 
     while not game_over:
         for event in pygame.event.get():
@@ -257,33 +285,42 @@ def game_loop():
             # Управление игроком
             player.handle_keys(event)
 
-        player.move()
+            # Обработка паузы
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = not paused  # Переключение паузы
 
-        # Фон
-        screen.fill(BLACK)
+        if not paused:
+            player.move()
 
-        # Отрисовка дороги
-        road.move()
-        road.draw()
+            # Фон
+            screen.fill(BLACK)
 
-        # Обновление и отрисовка врагов
-        enemy_manager.move_enemies()
-        enemy_manager.draw_enemies()
+            # Отрисовка дороги
+            road.move()
+            road.draw()
 
-        # Отрисовка игрока
-        player.draw()
+            # Обновление и отрисовка врагов
+            enemy_manager.move_enemies()
+            enemy_manager.draw_enemies()
 
-        # Увеличение очков
-        score += 1
+            # Отрисовка игрока
+            player.draw()
 
-        # Отображение счета
-        draw_score(score)
+            # Увеличение очков
+            score += 1
 
-        # Проверка столкновений с врагами
-        for enemy in enemy_manager.enemies:
-            if player.y < enemy.y + CAR_HEIGHT and player.y + CAR_HEIGHT > enemy.y:
-                if player.x < enemy.x + CAR_WIDTH and player.x + CAR_WIDTH > enemy.x:
-                    game_over = True
+            # Отображение счета
+            draw_score(score)
+
+            # Проверка столкновений с врагами
+            for enemy in enemy_manager.enemies:
+                if player.y < enemy.y + CAR_HEIGHT and player.y + CAR_HEIGHT > enemy.y:
+                    if player.x < enemy.x + CAR_WIDTH and player.x + CAR_WIDTH > enemy.x:
+                        game_over = True
+        else:
+            # Если игра на паузе, отображаем сообщение
+            draw_pause()
 
         pygame.display.update()
         clock.tick(60)
@@ -299,5 +336,6 @@ def game_loop():
 
 
 # Запуск игры
+main_menu()  # Сначала показываем главное меню
 game_loop()
-pygame.quit()
+pygame.quit() 
