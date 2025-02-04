@@ -18,7 +18,7 @@ YELLOW = (255, 255, 0)
 
 # Создание окна
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Race")
+pygame.display.set_caption("Need for Speed")
 
 # Часы
 clock = pygame.time.Clock()
